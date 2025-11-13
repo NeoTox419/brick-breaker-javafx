@@ -1,8 +1,6 @@
-module com.saikat.brickbreaker.brickbreakerjavafx {
+module com.saikat.brickbreaker {
     requires javafx.controls;
-    requires javafx.fxml;
+    requires javafx.graphics;
 
-
-    opens com.saikat.brickbreaker.brickbreakerjavafx to javafx.fxml;
-    exports com.saikat.brickbreaker.brickbreakerjavafx;
+    exports com.saikat.brickbreaker;
 }
