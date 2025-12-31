@@ -10,6 +10,10 @@ import javafx.stage.Stage;
 
 public class GameApp extends Application {
 
+    private Paddle paddle;
+    private Ball ball;
+    private boolean moveLeft = false;
+    private boolean moveRight = false;
     public static final int WIDTH = 800;
     public static final int HEIGHT = 600;
 
@@ -29,8 +33,25 @@ public class GameApp extends Application {
         Pane root = new Pane(canvas);
         Scene scene = new Scene(root);
 
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case LEFT, A -> moveLeft = true;
+                case RIGHT, D -> moveRight = true;
+            }
+        });
+
+        scene.setOnKeyReleased(e -> {
+            switch (e.getCode()) {
+                case LEFT, A -> moveLeft = false;
+                case RIGHT, D -> moveRight = false;
+            }
+        });
+
         stage.setScene(scene);
         stage.show();
+
+        paddle = new Paddle(WIDTH / 2 - 60, HEIGHT - 40);
+        ball = new Ball(WIDTH / 2, HEIGHT / 2);
 
         AnimationTimer timer = new AnimationTimer() {
             @Override
@@ -48,11 +69,21 @@ public class GameApp extends Application {
     }
 
     private void update(double dt) {
-        // TODO: game logic
+        paddle.update(dt, moveLeft, moveRight);
+
+        ball.update(dt);
+        ball.bounceFromPaddle(paddle);
+
+        if (ball.isOutOfBounds()) {
+            ball.reset(WIDTH / 2, HEIGHT / 2);
+        }
     }
 
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, WIDTH, HEIGHT);
-        gc.fillText("Brick Breaker Skeleton Running", 20, 20);
+        paddle.render(gc);
+        ball.render(gc);
+        gc.fillText("Brick Breaker", 20, 20);
     }
+
 }
