@@ -18,6 +18,8 @@ public class GameApp extends Application {
     public static final int HEIGHT = 600;
 
     private long lastTime = 0L;
+    private Brick[] bricks;
+    private int score = 0;
 
     public static void main(String[] args) {
         launch(args);
@@ -65,6 +67,25 @@ public class GameApp extends Application {
             }
         };
 
+        int rows = 5;
+        int cols = 10;
+        double brickWidth = 70;
+        double brickHeight = 25;
+        double padding = 10;
+        double offsetX = 35;
+        double offsetY = 50;
+
+        bricks = new Brick[rows * cols];
+        int index = 0;
+
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                double x = offsetX + col * (brickWidth + padding);
+                double y = offsetY + row * (brickHeight + padding);
+                bricks[index++] = new Brick(x, y, brickWidth, brickHeight);
+            }
+        }
+
         timer.start();
     }
 
@@ -74,16 +95,28 @@ public class GameApp extends Application {
         ball.update(dt);
         ball.bounceFromPaddle(paddle);
 
+        for (Brick brick : bricks) {
+            if (ball.bounceFromBrick(brick)) {
+                score += 10;
+                break; // only hit one brick per frame
+            }
+        }
         if (ball.isOutOfBounds()) {
-            ball.reset(WIDTH / 2, HEIGHT / 2);
+            ball.reset(
+                    paddle.x + paddle.width / 2,
+                    paddle.y - 10
+            );
         }
     }
 
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, WIDTH, HEIGHT);
+        for (Brick brick : bricks) {
+            brick.render(gc);
+        }
         paddle.render(gc);
         ball.render(gc);
-        gc.fillText("Brick Breaker", 20, 20);
+        gc.fillText("Score: " + score, 20, 20);
     }
 
 }

@@ -48,6 +48,21 @@ public class Ball {
         return y - radius > GameApp.HEIGHT;
     }
 
+    public boolean bounceFromBrick(Brick brick) {
+        if (brick.destroyed) return false;
+
+        if (x + radius > brick.x &&
+                x - radius < brick.x + brick.width &&
+                y + radius > brick.y &&
+                y - radius < brick.y + brick.height) {
+
+            vy *= -1;
+            brick.destroyed = true;
+            return true;
+        }
+        return false;
+    }
+
     public void reset(double x, double y) {
         this.x = x;
         this.y = y;
