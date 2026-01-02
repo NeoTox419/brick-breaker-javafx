@@ -72,7 +72,12 @@ public class GameApp extends Application {
         double brickWidth = 70;
         double brickHeight = 25;
         double padding = 10;
-        double offsetX = 35;
+        // total width of brick grid
+        double totalBrickWidth =
+                cols * brickWidth + (cols - 1) * padding;
+
+        // center the grid horizontally
+        double offsetX = (WIDTH - totalBrickWidth) / 2;
         double offsetY = 50;
 
         bricks = new Brick[rows * cols];
