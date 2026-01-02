@@ -21,6 +21,9 @@ public class GameApp extends Application {
     private Brick[] bricks;
     private int score = 0;
 
+    private int lives = 3;
+    private boolean gameOver = false;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -39,6 +42,7 @@ public class GameApp extends Application {
             switch (e.getCode()) {
                 case LEFT, A -> moveLeft = true;
                 case RIGHT, D -> moveRight = true;
+                case R -> restartGame();
             }
         });
 
@@ -95,6 +99,7 @@ public class GameApp extends Application {
     }
 
     private void update(double dt) {
+        if (gameOver) return;
         paddle.update(dt, moveLeft, moveRight);
 
         ball.update(dt);
@@ -103,25 +108,56 @@ public class GameApp extends Application {
         for (Brick brick : bricks) {
             if (ball.bounceFromBrick(brick)) {
                 score += 10;
-                break; // only hit one brick per frame
+                break;
             }
         }
+
         if (ball.isOutOfBounds()) {
-            ball.reset(
-                    paddle.x + paddle.width / 2,
-                    paddle.y - 10
-            );
+            lives--;
+
+            if (lives <= 0) {
+                gameOver = true;
+            } else {
+                ball.reset(
+                        paddle.x + paddle.width / 2,
+                        paddle.y - 10
+                );
+            }
         }
     }
 
     private void render(GraphicsContext gc) {
         gc.clearRect(0, 0, WIDTH, HEIGHT);
+
         for (Brick brick : bricks) {
             brick.render(gc);
         }
+
         paddle.render(gc);
         ball.render(gc);
+
         gc.fillText("Score: " + score, 20, 20);
+        gc.fillText("Lives: " + lives, WIDTH - 80, 20);
+
+        if (gameOver) {
+            gc.fillText("GAME OVER", WIDTH / 2 - 40, HEIGHT / 2);
+            gc.fillText("Press R to Restart", WIDTH / 2 - 60, HEIGHT / 2 + 20);
+        }
+    }
+
+    private void restartGame() {
+        score = 0;
+        lives = 3;
+        gameOver = false;
+
+        ball.reset(
+                paddle.x + paddle.width / 2,
+                paddle.y - 10
+        );
+
+        for (Brick brick : bricks) {
+            brick.destroyed = false;
+        }
     }
 
 }
